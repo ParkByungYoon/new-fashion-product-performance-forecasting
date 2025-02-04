@@ -3,14 +3,14 @@ from einops import rearrange
 from MVTSF.layer.Transformer import *
 
 class CrossedTransformerEncoder(nn.Module):
-    def __init__(self, embedding_dim, input_len, segment_len):
+    def __init__(self, embedding_dim, input_len, segment_len, num_heads=4, dropout=0.2):
         super().__init__()
         self.input_linear = SegmentEmbedding(embedding_dim, segment_len)
         self.num_segments = input_len//segment_len
         self.pos_embedding = PositionalEncoding(embedding_dim, max_len=self.num_segments)
-        time_encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=4, dropout=0.2)
+        time_encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout)
         self.time_encoder = nn.TransformerEncoder(time_encoder_layer, num_layers=1)
-        var_encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=4, dropout=0.2)
+        var_encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout)
         self.var_encoder = nn.TransformerEncoder(var_encoder_layer, num_layers=1)
 
     def forward(self, inputs):

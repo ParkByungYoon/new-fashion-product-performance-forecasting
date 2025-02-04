@@ -34,6 +34,7 @@ class Transformer(PytorchLightningBase):
     
     def forward(self, inputs, release_dates, image_embedding, text_embedding, meta_data):
         inputs, _ = self.split_inputs(inputs, meta_data)
+        inputs = (inputs - inputs.mean()) / inputs.std()
         encoder_embedding = self.transformer_encoder(inputs)
         temporal_embedding = self.temporal_feature_encoder(release_dates)
         fusion_embedding = self.feature_fusion_network(image_embedding, text_embedding, temporal_embedding, meta_data)

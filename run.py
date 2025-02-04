@@ -65,7 +65,7 @@ def run(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Zero-Shot-Item-Sales-Forecasting')
+    parser = argparse.ArgumentParser(description='Multivariate-Time-Series-Forecasting')
     # General arguments
     parser.add_argument('--data_dir', type=str, default='/SSL_NAS/SFLAB/mind_bridge/preprocessed')
     parser.add_argument('--log_dir', type=str, default='log')

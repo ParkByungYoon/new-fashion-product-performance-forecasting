@@ -75,5 +75,5 @@ class PytorchLightningBase(pl.LightningModule):
         mask = torch.ones((batch_size, num_vars), dtype=torch.bool)
         rows = torch.arange(batch_size).unsqueeze(-1).expand(-1, 3)
         mask[rows, endo_idx] = False
-        exo_inputs =inputs[mask].view(batch_size, -1, 52)
+        exo_inputs = inputs[mask].view(batch_size, -1, 52)
         return endo_inputs, exo_inputs

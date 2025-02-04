@@ -89,11 +89,11 @@ class MultiVariateDataModule(pl.LightningDataModule):
     
     def prepare_data(self):
         self.data_dict = {}
-        self.data_dict['multi_vars'] = pd.read_csv(os.path.join(self.data_dir, 'multi_vars.csv'), index_col=0).sort_index(axis=1)
+        self.data_dict['multi_vars'] = pd.read_csv(os.path.join(self.data_dir, 'multi_vars.csv'), index_col=0)
         self.data_dict['sales'] = pd.read_csv(os.path.join(self.data_dir, 'sales.csv'), index_col=0).iloc[:,1:] / 1820.0
         self.data_dict['release_idx'] = pickle.load(open(os.path.join(self.data_dir, 'release_idx.pkl'), 'rb'))
         self.data_dict['release_date'] = pd.read_csv(os.path.join(self.data_dir, 'release_date.csv'), index_col=0)
-        self.data_dict['meta'] = pd.read_csv(os.path.join(self.data_dir, 'meta.csv'), index_col=0)
+        self.data_dict['meta'] = pd.read_csv(os.path.join(self.data_dir, 'meta.csv'), index_col=0).sort_index(axis=1)
         self.data_dict['image_embedding'] = pickle.load(open(os.path.join(self.data_dir, 'image_embedding.pkl'), 'rb'))
         self.data_dict['text_embedding'] = pickle.load(open(os.path.join(self.data_dir, 'text_embedding.pkl'), 'rb'))
 

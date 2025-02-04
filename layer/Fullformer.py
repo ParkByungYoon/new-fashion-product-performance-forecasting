@@ -1,12 +1,12 @@
 from MVTSF.layer.Transformer import *
 
 class FullAttentionTransformerEncoder(nn.Module):
-    def __init__(self, embedding_dim, input_len, segment_len):
+    def __init__(self, embedding_dim, input_len, segment_len, num_heads=4, dropout=0.2):
         super().__init__()
         self.input_linear = SegmentEmbedding(embedding_dim, segment_len)
         self.num_segments = input_len//segment_len
         self.pos_embedding = PositionalEncoding(embedding_dim, max_len=self.num_segments)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=4, dropout=0.2)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout)
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
 
     def forward(self, inputs):

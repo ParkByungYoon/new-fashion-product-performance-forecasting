@@ -73,11 +73,11 @@ class FeatureFusionNetwork(nn.Module):
 
 
 class TransformerEncoder(nn.Module):
-    def __init__(self, embedding_dim, input_len, num_vars):
+    def __init__(self, embedding_dim, input_len, num_vars, num_heads=4, dropout=0.2):
         super().__init__()
         self.input_linear = TimeDistributed(nn.Linear(num_vars, embedding_dim))
         self.pos_embedding = PositionalEncoding(embedding_dim, max_len=input_len)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=4, dropout=0.2)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout)
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
 
     def forward(self, inputs):
@@ -90,7 +90,7 @@ class TransformerEncoder(nn.Module):
 
 class TransformerDecoderLayer(nn.Module):
 
-    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, activation="relu"):
+    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.2):
         super(TransformerDecoderLayer, self).__init__()
         
         self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)

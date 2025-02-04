@@ -2,10 +2,10 @@ import torch.nn as nn
 from MVTSF.layer.Transformer import *
 
 class InvertedEndogenousEncoder(nn.Module):
-    def __init__(self, embedding_dim, input_len):
+    def __init__(self, embedding_dim, input_len, num_heads=4, dropout=0.2):
         super().__init__()
         self.input_linear = TimeDistributed(nn.Linear(input_len, embedding_dim))
-        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=4, dropout=0.2)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout)
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
 
     def forward(self, inputs, fusion_emb):
@@ -23,7 +23,7 @@ class EndogenousEncoder(nn.Module):
         self.input_linear = TimeDistributed(nn.Linear(num_vars, embedding_dim))
         self.pos_embedding = PositionalEncoding(embedding_dim, max_len=input_len)
         encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=4, dropout=0.2)
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
+        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=1)
 
     def forward(self, inputs, fusion_emb):
         if inputs.dim() <= 2: inputs = inputs.unsqueeze(dim=-1)
