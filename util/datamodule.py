@@ -75,7 +75,7 @@ class MultiVariateDataset(Dataset):
         release_idx = self.release_indices[idx].to(torch.int64).item()
         if release_idx - 52 < 0:
             zero_pad = torch.zeros(self.multi_vars.size(0), 52)
-            zero_pad[:, :release_idx] = self.multi_vars[:,:release_idx]
+            zero_pad[:, 52-release_idx:52] = self.multi_vars[:,:release_idx]
             return zero_pad
         return self.multi_vars[:,release_idx-52:release_idx]
 
