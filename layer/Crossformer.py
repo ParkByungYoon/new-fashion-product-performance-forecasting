@@ -8,9 +8,9 @@ class CrossedTransformerEncoder(nn.Module):
         self.input_linear = SegmentEmbedding(embedding_dim, segment_len)
         self.num_segments = input_len//segment_len
         self.pos_embedding = PositionalEncoding(embedding_dim, max_len=self.num_segments)
-        time_encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout)
+        time_encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout, batch_first=True)
         self.time_encoder = nn.TransformerEncoder(time_encoder_layer, num_layers=1)
-        var_encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout)
+        var_encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout, batch_first=True)
         self.var_encoder = nn.TransformerEncoder(var_encoder_layer, num_layers=1)
 
     def forward(self, inputs):

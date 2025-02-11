@@ -6,7 +6,7 @@ class FullAttentionTransformerEncoder(nn.Module):
         self.input_linear = SegmentEmbedding(embedding_dim, segment_len)
         self.num_segments = input_len//segment_len
         self.pos_embedding = PositionalEncoding(embedding_dim, max_len=self.num_segments)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout, batch_first=True)
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
 
     def forward(self, inputs):

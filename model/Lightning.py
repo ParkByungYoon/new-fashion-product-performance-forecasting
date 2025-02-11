@@ -67,13 +67,14 @@ class PytorchLightningBase(pl.LightningModule):
     def split_inputs(self, inputs, meta_data):
         batch_size, num_vars = meta_data.shape
         endo_idx = torch.stack([meta_data[:,:27].argmax(dim=1),\
-                                meta_data[:,27:34].argmax(dim=1)+27, \
+                                # meta_data[:,27:34].argmax(dim=1)+27, \
                                 meta_data[:,34:].argmax(dim=1)+34],axis=-1)
         gather_idx = endo_idx.unsqueeze(-1).expand(-1,-1, 52)
         endo_inputs = inputs.gather(dim=1, index=gather_idx)
 
         mask = torch.ones((batch_size, num_vars), dtype=torch.bool)
-        rows = torch.arange(batch_size).unsqueeze(-1).expand(-1, 3)
+        rows = torch.arange(batch_size).unsqueeze(-1).expand(-1, 2)
         mask[rows, endo_idx] = False
+        mask[rows, 27:34] = False
         exo_inputs = inputs[mask].view(batch_size, -1, 52)
         return endo_inputs, exo_inputs

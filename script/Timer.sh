@@ -1,6 +1,6 @@
-model_name=Fullformer
+model_name=Timer
 gpu_num=2
-num_vars=50
+num_vars=43
 segment_len=4
 
 python -u run.py \

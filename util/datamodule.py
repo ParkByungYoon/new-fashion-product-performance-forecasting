@@ -50,7 +50,9 @@ class MultiVariateDataset(Dataset):
         
         self.item_ids = item_ids
         self.item_sales = torch.FloatTensor(np.array(item_sales))
+
         self.multi_vars = torch.FloatTensor(self.data_dict['multi_vars'].values)
+
         self.release_indices = torch.FloatTensor(np.array(release_indices))
         self.release_dates = torch.FloatTensor(np.array(release_dates))
         self.image_embeddings = torch.FloatTensor(np.array(image_embeddings))
@@ -58,9 +60,12 @@ class MultiVariateDataset(Dataset):
         self.meta_data = torch.FloatTensor(np.array(meta_data))
     
     def __getitem__(self, idx):
+        multi_vars = self.multi_variate(idx)
+        multi_vars[:27] = self.normalize(multi_vars[:27])
+        multi_vars[27:34] = self.normalize(multi_vars[27:34])
+        multi_vars[34:] = self.normalize(multi_vars[34:])
         return \
-            self.item_sales[idx],\
-            self.multi_variate(idx),\
+            self.item_sales[idx], multi_vars,\
             self.release_dates[idx],\
             self.image_embeddings[idx],\
             self.text_embeddings[idx],\
@@ -73,6 +78,9 @@ class MultiVariateDataset(Dataset):
             zero_pad[:, :release_idx] = self.multi_vars[:,:release_idx]
             return zero_pad
         return self.multi_vars[:,release_idx-52:release_idx]
+
+    def normalize(self, x):
+        return (x - x.mean()) / (x.std() + 1e-5)
 
     def __len__(self):
         return len(self.item_ids)
