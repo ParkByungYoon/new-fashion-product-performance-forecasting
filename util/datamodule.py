@@ -90,6 +90,8 @@ class MultiVariateDataModule(pl.LightningDataModule):
     def __init__(self, args):
         super().__init__()
         self.data_dir = args.data_dir
+        self.mu = args.mu
+        self.sigma = args.sigma
         self.batch_size = args.batch_size
         self.train_item_ids = pickle.load(open(os.path.join(args.data_dir, 'train_item_ids.pkl'), 'rb'))
         self.valid_item_ids = pickle.load(open(os.path.join(args.data_dir, 'valid_item_ids.pkl'), 'rb'))
@@ -98,7 +100,7 @@ class MultiVariateDataModule(pl.LightningDataModule):
     def prepare_data(self):
         self.data_dict = {}
         self.data_dict['multi_vars'] = pd.read_csv(os.path.join(self.data_dir, 'multi_vars.csv'), index_col=0)
-        self.data_dict['sales'] = pd.read_csv(os.path.join(self.data_dir, 'sales.csv'), index_col=0).iloc[:,1:] / 1820.0
+        self.data_dict['sales'] = (pd.read_csv(os.path.join(self.data_dir, 'sales.csv'), index_col=0).iloc[:,1:] - self.mean) / self.std
         self.data_dict['release_idx'] = pickle.load(open(os.path.join(self.data_dir, 'release_idx.pkl'), 'rb'))
         self.data_dict['release_date'] = pd.read_csv(os.path.join(self.data_dir, 'release_date.csv'), index_col=0)
         self.data_dict['meta'] = pd.read_csv(os.path.join(self.data_dir, 'meta.csv'), index_col=0).sort_index(axis=1)

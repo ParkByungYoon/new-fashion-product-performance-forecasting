@@ -84,6 +84,8 @@ if __name__ == '__main__':
     parser.add_argument('--num_layers', type=int, default=2)
 
     # Specific arguments
+    parser.add_argument('--mu', type=float, default=39.950221363872515)
+    parser.add_argument('--sigma', type=float, default=72.5971755069324)
     parser.add_argument('--segment_len', type=int, default=4)
     parser.add_argument('--num_endo_vars', type=int, default=3)
     parser.add_argument('--num_exo_vars', type=int, default=47)

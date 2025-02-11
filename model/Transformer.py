@@ -19,6 +19,8 @@ class Transformer(PytorchLightningBase):
         self.num_vars = args.num_vars
         self.num_layers = args.num_layers
         self.segment_len = args.segment_len
+        self.mu = args.mu
+        self.sigma = args.sigma
         self.save_hyperparameters()
 
         self.transformer_encoder = TransformerEncoder(self.hidden_dim, self.input_len, self.num_vars)
@@ -55,8 +57,11 @@ class Transformer(PytorchLightningBase):
             score['loss'] = F.mse_loss(item_sales, forecasted_sales.squeeze())
             self.log_dict({f"{phase}_{k}":v for k,v in score.items()}, on_step=False, on_epoch=True)
 
-            rescaled_score = self.get_score(item_sales * 1820, forecasted_sales * 1820)
+            rescaled_score = self.get_score(self.denormalize(item_sales), self.denormalize(forecasted_sales))
             self.log_dict({f"{phase}_rescaled_{k}":v for k,v in rescaled_score.items()}, on_step=False, on_epoch=True)
             return score['loss']
         else:
-            return forecasted_sales * 1820
+            return self.denormalize(forecasted_sales)
+    
+    def denormalize(self, x):
+        return (x * self.sigma) + self.mu
