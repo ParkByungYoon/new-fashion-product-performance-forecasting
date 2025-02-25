@@ -17,6 +17,7 @@ class Transformer(PytorchLightningBase):
         self.lr = args.learning_rate
         self.num_heads = args.num_heads
         self.num_vars = args.num_vars
+        self.num_meta = args.num_meta
         self.num_layers = args.num_layers
         self.segment_len = args.segment_len
         self.mu = args.mu
@@ -25,7 +26,7 @@ class Transformer(PytorchLightningBase):
 
         self.transformer_encoder = TransformerEncoder(self.hidden_dim, self.input_len, self.num_vars)
         self.temporal_feature_encoder = TemporalFeatureEncoder(self.embedding_dim)
-        self.feature_fusion_network = FeatureFusionNetwork(self.embedding_dim, self.hidden_dim)
+        self.feature_fusion_network = FeatureFusionNetwork(self.embedding_dim, self.num_meta)
 
         decoder_layer = TransformerDecoderLayer(d_model=self.hidden_dim, nhead=self.num_heads, dim_feedforward=self.hidden_dim * 4, dropout=0.1)
         self.decoder = nn.TransformerDecoder(decoder_layer, self.num_layers)
@@ -37,8 +38,8 @@ class Transformer(PytorchLightningBase):
     def forward(self, inputs, release_dates, image_embedding, text_embedding, meta_data):
         inputs, exo_inputs = self.split_inputs(inputs, meta_data)
         inputs = torch.cat([inputs, exo_inputs], axis=1)
-        # encoder_embedding = self.transformer_encoder(inputs)[:,:2,:]
         encoder_embedding = self.transformer_encoder(inputs)
+        
         temporal_embedding = self.temporal_feature_encoder(release_dates)
         fusion_embedding = self.feature_fusion_network(image_embedding, text_embedding, temporal_embedding, meta_data)
             

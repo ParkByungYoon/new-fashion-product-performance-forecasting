@@ -53,15 +53,15 @@ class TimeDistributed(nn.Module):
     
 
 class FeatureFusionNetwork(nn.Module):
-    def __init__(self, embedding_dim, hidden_dim, dropout=0.2):
+    def __init__(self, embedding_dim, num_meta, dropout=0.2):
         super(FeatureFusionNetwork, self).__init__()
-        self.meta_linear = nn.Linear(50, embedding_dim)
+        self.meta_linear = nn.Linear(num_meta, embedding_dim)
         self.batchnorm = nn.BatchNorm1d(embedding_dim*4)
         self.feature_fusion = nn.Sequential(
-            nn.Linear(embedding_dim*4, hidden_dim*2, bias=False),
+            nn.Linear(embedding_dim*4, embedding_dim*2, bias=False),
             nn.ReLU(),
             nn.Dropout(dropout),
-            nn.Linear(hidden_dim*2, hidden_dim)
+            nn.Linear(embedding_dim*2, embedding_dim)
         )
 
     def forward(self, image_embedding, text_embedding, temporal_embedding, meta_data):

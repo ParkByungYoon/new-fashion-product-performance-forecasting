@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 import wandb
 import random
-from util.datamodule import MultiVariateDataModule
+from util.datamodule import MultiVariateDataModule, MultiSalesDataModule
 import datetime
 
 import pytorch_lightning as pl
@@ -58,10 +58,10 @@ def run(args):
         logger=wandb_logger,
         callbacks=[checkpoint_callback]
     )
-    trainer.fit(model, datamodule=MultiVariateDataModule(args))
+    trainer.fit(model, datamodule=MultiSalesDataModule(args))
     print(checkpoint_callback.best_model_path)
     ckpt_path = checkpoint_callback.best_model_path
-    trainer.test(model=model, ckpt_path=ckpt_path, datamodule=MultiVariateDataModule(args))
+    trainer.test(model=model, ckpt_path=ckpt_path, datamodule=MultiSalesDataModule(args))
 
 
 if __name__ == '__main__':
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=128)
     parser.add_argument('--embedding_dim', type=int, default=512)
     parser.add_argument('--hidden_dim', type=int, default=512)
-    parser.add_argument('--input_len', type=int, default=52)
+    parser.add_argument('--input_len', type=int, default=12)
     parser.add_argument('--output_len', type=int, default=12)
     parser.add_argument('--num_heads', type=int, default=8)
     parser.add_argument('--num_layers', type=int, default=2)
@@ -90,6 +90,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_endo_vars', type=int, default=3)
     parser.add_argument('--num_exo_vars', type=int, default=47)
     parser.add_argument('--num_vars', type=int, default=50)
+    parser.add_argument("--num_meta", type=int, default=52)
 
     # wandb arguments
     parser.add_argument('--wandb_entity', type=str, default='bonbak')

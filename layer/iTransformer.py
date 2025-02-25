@@ -14,3 +14,4 @@ class InversedTransformerEncoder(nn.Module):
         emb = self.input_linear(inputs)
         emb = self.encoder(emb)
         return emb
+        # return emb[:, :4]   

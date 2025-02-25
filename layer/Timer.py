@@ -14,19 +14,18 @@ class TimerEncoder(nn.Module):
         emb = self.input_linear(inputs) # (64, 50, 13, 512)
         emb = rearrange(emb, 'b d num_segments embedding_dim -> (b d) num_segments embedding_dim') # (64*50, 13, 512)
         emb = self.pos_embedding(emb)
-        emb = rearrange(emb, '(b d) num_segments embedding_dim-> b (num_segments d) embedding_dim', b = batch) # (64, 50*13, 512)
+        emb = rearrange(emb, '(b d) num_segments embedding_dim-> b (num_segments d) embedding_dim', b = batch) # (64, 13*50, 512)
         
-        dependency_mask = torch.ones(num_vars, num_vars)
-        # dependency_mask = torch.eye(num_vars)
-        # dependency_mask[:2,:] = 1
-        # dependency_mask[:3,:3] = 1
-        # dependency_mask[0,3:29] = 1
-        # dependency_mask[1,29:35] = 1
-        # dependency_mask[2,35:] = 1
+        # dependency_mask = torch.ones(num_vars, num_vars)
+        dependency_mask = torch.eye(num_vars)
+        dependency_mask[:4,:4] = 1
         time_mask = (torch.triu(torch.ones(self.num_segments, self.num_segments)) == 1).transpose(0, 1)
         time_mask = time_mask.float().contiguous()
         mask = torch.kron(dependency_mask, time_mask)
         mask = mask.masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0)).to(inputs.device)
 
         emb = self.encoder(emb, mask)
+        emb = rearrange(emb, 'b (num_segments d) embedding_dim-> b d num_segments embedding_dim', d = num_vars) # (64, 52, 12, 512)
+        emb = emb[:,:4]
+        emb = rearrange(emb, 'b d num_segments embedding_dim-> b (d num_segments) embedding_dim') # (64, 4*12, 512)
         return emb

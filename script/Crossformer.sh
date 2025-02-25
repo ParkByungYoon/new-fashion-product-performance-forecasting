@@ -1,7 +1,7 @@
 model_name=Crossformer
 gpu_num=1
-num_vars=50
-segment_len=4
+num_vars=52
+segment_len=1
 
 python -u run.py \
     --model_name $model_name \

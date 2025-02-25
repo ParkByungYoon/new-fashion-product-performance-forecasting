@@ -1,7 +1,7 @@
 model_name=Timer
 gpu_num=2
-num_vars=43
-segment_len=4
+num_vars=52
+segment_len=1
 
 python -u run.py \
     --model_name $model_name \
