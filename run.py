@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 import wandb
 import random
-from util.datamodule import MultiVariateDataModule, MultiSalesDataModule
+from util.datamodule import MedianSalesDataModule, MultiSalesDataModule
 import datetime
 
 import pytorch_lightning as pl
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='/SSL_NAS/SFLAB/mind_bridge/preprocessed')
     parser.add_argument('--log_dir', type=str, default='log')
     parser.add_argument('--seed', type=int, default=21)
-    parser.add_argument('--num_epochs', type=int, default=200)
+    parser.add_argument('--num_epochs', type=int, default=100)
     parser.add_argument('--gpu_num', type=int, default=1)
     parser.add_argument('--learning_rate', type=float, default=0.0001)
 
@@ -84,11 +84,9 @@ if __name__ == '__main__':
     parser.add_argument('--num_layers', type=int, default=2)
 
     # Specific arguments
-    parser.add_argument('--mu', type=float, default=39.950221363872515)
-    parser.add_argument('--sigma', type=float, default=72.5971755069324)
     parser.add_argument('--segment_len', type=int, default=4)
-    parser.add_argument('--num_endo_vars', type=int, default=3)
-    parser.add_argument('--num_exo_vars', type=int, default=47)
+    parser.add_argument('--num_endo_vars', type=int, default=4)
+    parser.add_argument('--num_exo_vars', type=int, default=48)
     parser.add_argument('--num_vars', type=int, default=50)
     parser.add_argument("--num_meta", type=int, default=52)
 

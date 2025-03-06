@@ -20,8 +20,6 @@ class Transformer(PytorchLightningBase):
         self.num_meta = args.num_meta
         self.num_layers = args.num_layers
         self.segment_len = args.segment_len
-        self.mu = args.mu
-        self.sigma = args.sigma
         self.save_hyperparameters()
 
         self.transformer_encoder = TransformerEncoder(self.hidden_dim, self.input_len, self.num_vars)
@@ -37,7 +35,8 @@ class Transformer(PytorchLightningBase):
     
     def forward(self, inputs, release_dates, image_embedding, text_embedding, meta_data):
         inputs, exo_inputs = self.split_inputs(inputs, meta_data)
-        inputs = torch.cat([inputs, exo_inputs], axis=1)
+        if self.num_vars > 4:
+            inputs = torch.cat([inputs, exo_inputs], axis=1)
         encoder_embedding = self.transformer_encoder(inputs)
         
         temporal_embedding = self.temporal_feature_encoder(release_dates)
@@ -52,17 +51,28 @@ class Transformer(PytorchLightningBase):
 
     def phase_step(self, batch, phase):
         item_sales, inputs, release_dates, image_embeddings, text_embeddings, meta_data = batch
+        if phase in ['train', 'valid']:
+            center, scale = 39.9502, 72.5971
+        elif phase in ['test', 'predict']:
+            center, scale = 40.8935, 74.3419
+        item_sales = self.normalize(item_sales, center, scale)
+        
         forecasted_sales, _ = self.forward(inputs, release_dates, image_embeddings, text_embeddings, meta_data)
         if phase != 'predict':
             score = self.get_score(item_sales, forecasted_sales)
             score['loss'] = F.mse_loss(item_sales, forecasted_sales.squeeze())
             self.log_dict({f"{phase}_{k}":v for k,v in score.items()}, on_step=False, on_epoch=True)
 
-            rescaled_score = self.get_score(self.denormalize(item_sales), self.denormalize(forecasted_sales))
+            rescaled_sales = self.denormalize(item_sales, center, scale)
+            rescaled_forecasted_sales = self.denormalize(forecasted_sales, center, scale)
+            rescaled_score = self.get_score(rescaled_sales, rescaled_forecasted_sales)
             self.log_dict({f"{phase}_rescaled_{k}":v for k,v in rescaled_score.items()}, on_step=False, on_epoch=True)
             return score['loss']
         else:
-            return self.denormalize(forecasted_sales)
+            return self.denormalize(forecasted_sales, center, scale)
     
-    def denormalize(self, x):
-        return (x * self.sigma) + self.mu
+    def denormalize(self, x, center, scale):
+        return (x * scale) + center
+
+    def normalize(self, x, center, scale):
+        return (x - center) / scale

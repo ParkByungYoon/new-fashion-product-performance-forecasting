@@ -15,6 +15,7 @@ class CrossedTransformerEncoder(nn.Module):
 
     def forward(self, inputs):
         batch, num_vars, input_len = inputs.shape # (64, 3, 52)
+        n = 3 if num_vars == 45 else 4
         emb = self.input_linear(inputs) # (64, 3, 13, 512)
         # time --> domain
         emb = rearrange(emb, 'b d num_segments embedding_dim -> (b d) num_segments embedding_dim') # (64*3, 13, 512)
@@ -24,6 +25,6 @@ class CrossedTransformerEncoder(nn.Module):
         emb = self.var_encoder(emb)
         # emb = rearrange(emb, '(b num_segments) d embedding_dim-> b (num_segments d) embedding_dim', b = batch, num_segments=self.num_segments) # (64, 13*3, 512)
         emb = rearrange(emb, '(b num_segments) d embedding_dim-> b d num_segments embedding_dim', b = batch, num_segments=self.num_segments) # (64, 13*3, 512)
-        emb = emb[:,:4]
+        emb = emb[:,:n]
         emb = rearrange(emb, 'b d num_segments embedding_dim-> b (d num_segments) embedding_dim') # (64, 4*12, 512)
         return emb

@@ -9,9 +9,11 @@ class InversedTransformerEncoder(nn.Module):
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
 
     def forward(self, inputs):
+        batch, num_vars, input_len = inputs.shape # (64, 3, 52)
+        n = 3 if num_vars == 45 else 4
+
         inputs = inputs.permute(0,2,1)
         if inputs.dim() <= 2: inputs = inputs.unsqueeze(dim=-1)
         emb = self.input_linear(inputs)
         emb = self.encoder(emb)
-        return emb
-        # return emb[:, :4]   
+        return emb[:, :n]

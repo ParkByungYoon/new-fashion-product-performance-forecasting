@@ -1,5 +1,5 @@
 model_name=Crossformer
-gpu_num=1
+gpu_num=0
 num_vars=52
 segment_len=1
 

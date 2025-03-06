@@ -1,6 +1,6 @@
 model_name=Transformer
-gpu_num=1
-num_vars=52
+gpu_num=2
+num_vars=45
 
 python -u run.py \
     --model_name $model_name \

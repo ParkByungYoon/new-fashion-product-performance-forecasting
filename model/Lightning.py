@@ -60,14 +60,16 @@ class PytorchLightningBase(pl.LightningModule):
             score['r2_score'] = torch.mean(torch.stack(r2))
             score['mse'] = torch.mean(torch.stack(mse))
             score['mae'] = torch.mean(torch.stack(mae))
-            # score['accum_adjusted_smape'] = adjusted_smape(pred.sum(axis=1), gt.sum(axis=1)) * 0.5
 
         return score
 
     def split_inputs(self, inputs, meta_data):
         batch_size, num_vars, input_len = inputs.shape
-        offsets = [0,27,34,50]
-        slices = [slice(0, 27), slice(27, 34), slice(34, 50), slice(50, 52)]
+        if self.num_vars == 52:
+            offsets = [0,27,34,50,52]
+        elif self.num_vars == 45:
+            offsets = [0,27,43,45]
+        slices = [slice(offsets[i], offsets[i+1]) for i in range(len(offsets)-1)]
         endo_idx = torch.stack([meta_data[:,s].argmax(dim=1) + o for s, o in zip(slices, offsets)], dim=1)
 
         gather_idx = endo_idx.unsqueeze(-1).expand(-1,-1, input_len)

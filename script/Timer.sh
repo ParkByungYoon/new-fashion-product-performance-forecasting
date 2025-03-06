@@ -1,5 +1,5 @@
 model_name=Timer
-gpu_num=2
+gpu_num=3
 num_vars=52
 segment_len=1
 
