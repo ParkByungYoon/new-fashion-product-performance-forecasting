@@ -8,13 +8,13 @@ class TimeXer(Transformer):
         super().__init__(args)
         self.save_hyperparameters()
         self.num_endo_vars = args.num_endo_vars
-        self.num_exo_vars = args.num_vars - args.num_endo_vars
+        self.num_exo_vars = args.num_exo_vars
 
         self.temporal_feature_encoder = TemporalFeatureEncoder(self.embedding_dim)
         self.feature_fusion_network = FeatureFusionNetwork(self.embedding_dim, self.num_meta)
 
-        self.exo_encoder = ExogenousEncoder(self.embedding_dim, self.input_len, self.num_exo_vars)
-        self.endo_encoder = EndogenousEncoder(self.embedding_dim, self.input_len, self.num_endo_vars)
+        self.exo_encoder = ExogenousInvertedEncoder(self.embedding_dim, self.exo_input_len)
+        self.endo_encoder = EndogenousEncoder(self.embedding_dim, self.endo_input_len, self.num_endo_vars)
 
         self.encoders = nn.ModuleList(
             [
@@ -48,8 +48,7 @@ class TimeXer(Transformer):
         )
 
 
-    def forward(self, inputs, release_dates, image_embedding, text_embedding, meta_data):
-        endo_inputs, exo_inputs = self.split_inputs(inputs, meta_data)
+    def forward(self, endo_inputs, exo_inputs, release_dates, image_embedding, text_embedding, meta_data):
         temporal_embedding = self.temporal_feature_encoder(release_dates)
         fusion_embedding = self.feature_fusion_network(image_embedding, text_embedding, temporal_embedding, meta_data)
         

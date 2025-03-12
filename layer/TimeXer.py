@@ -32,7 +32,8 @@ class EndogenousEncoder(nn.Module):
         self.pos_embedding = PositionalEncoding(embedding_dim, max_len=input_len+1)
 
     def forward(self, inputs, fusion_embedding):
+        if inputs.dim() <= 2: inputs = inputs.unsqueeze(1)
         emb = self.input_linear(inputs)
-        emb = torch.cat([fusion_embedding.unsqueeze(1), emb], dim=1)
+        emb = torch.cat([fusion_embedding.unsqueeze(1), emb.squeeze()], dim=1)
         emb = self.pos_embedding(emb)
         return emb

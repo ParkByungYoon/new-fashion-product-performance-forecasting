@@ -5,4 +5,4 @@ import torch
 class iTransformer(Transformer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.transformer_encoder = InversedTransformerEncoder(self.hidden_dim, self.input_len)
+        self.transformer_encoder = InversedTransformerEncoder(self.hidden_dim, self.exo_input_len)
