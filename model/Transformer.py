@@ -15,8 +15,8 @@ class Transformer(PytorchLightningBase):
         self.endo_input_len = args.endo_input_len
         self.exo_input_len = args.exo_input_len
         self.output_len = args.output_len
-        self.hidden_dim = args.hidden_dim
-        self.embedding_dim = args.embedding_dim
+        self.output_dim = args.output_dim
+        self.input_dim = args.input_dim
         self.lr = args.learning_rate
         self.num_heads = args.num_heads
         self.num_exo_vars = args.num_exo_vars
@@ -27,14 +27,14 @@ class Transformer(PytorchLightningBase):
         self.scale = args.scale
         self.save_hyperparameters()
 
-        self.transformer_encoder = TransformerEncoder(self.hidden_dim, self.exo_input_len, self.num_exo_vars)
-        self.temporal_feature_encoder = TemporalFeatureEncoder(self.embedding_dim)
-        self.feature_fusion_network = FeatureFusionNetwork(self.embedding_dim, self.num_meta)
+        self.transformer_encoder = TransformerEncoder(self.output_dim, self.exo_input_len, self.num_exo_vars)
+        self.temporal_feature_encoder = TemporalFeatureEncoder(self.input_dim)
+        self.feature_fusion_network = FeatureFusionNetwork(self.input_dim, self.output_dim, self.num_meta)
 
-        decoder_layer = TransformerDecoderLayer(d_model=self.hidden_dim, nhead=self.num_heads, dim_feedforward=self.hidden_dim * 4, dropout=0.1)
+        decoder_layer = TransformerDecoderLayer(d_model=self.output_dim, nhead=self.num_heads, dim_feedforward=self.output_dim * 4, dropout=0.1)
         self.decoder = nn.TransformerDecoder(decoder_layer, self.num_layers)
         self.decoder_fc = nn.Sequential(
-            nn.Linear(self.hidden_dim, self.output_len),
+            nn.Linear(self.output_dim, self.output_len),
             nn.Dropout(0.2)
         )
     
@@ -53,33 +53,27 @@ class Transformer(PytorchLightningBase):
 
     def phase_step(self, batch, phase):
         item_sales, endo_inputs, exo_inputs, release_dates, image_embeddings, text_embeddings, meta_data = batch
-        # if phase in ['train', 'valid']:
-        #     center, scale = 39.9502, 72.5971
-        #     # center, scale = 22.9259, 37.9783
-        #     # center, scale = 0, 875
-        # elif phase in ['test', 'predict']:
-        #     center, scale = 40.8935, 74.3419
-        #     # center, scale = 22.7742, 37.4761
-        #     # center, scale = 0, 875
-        center, scale = self.center, self.scale
-        item_sales = self.normalize(item_sales, center, scale)
+        sales = self.normalize(item_sales)
         
         forecasted_sales, _ = self.forward(endo_inputs, exo_inputs, release_dates, image_embeddings, text_embeddings, meta_data)
-        if phase != 'predict':
-            score = get_score(item_sales, forecasted_sales)
-            score['loss'] = F.mse_loss(item_sales, forecasted_sales.squeeze())
-            self.log_dict({f"{phase}_{k}":v for k,v in score.items()}, on_step=False, on_epoch=True)
 
-            rescaled_sales = self.denormalize(item_sales, center, scale)
-            rescaled_forecasted_sales = self.denormalize(forecasted_sales, center, scale)
-            rescaled_score = get_score(rescaled_sales, rescaled_forecasted_sales)
-            self.log_dict({f"{phase}_rescaled_{k}":v for k,v in rescaled_score.items()}, on_step=False, on_epoch=True)
-            return score['loss']
-        else:
-            return self.denormalize(forecasted_sales, center, scale)
+        score = get_score(sales, forecasted_sales)
+        score['loss'] = F.mse_loss(sales, forecasted_sales.squeeze())
+
+        rescaled_forecasted_sales = self.denormalize(forecasted_sales)
+        rescaled_forecasted_sales = torch.clamp(rescaled_forecasted_sales, min=0)
+        rescaled_score = get_score(item_sales, rescaled_forecasted_sales)
+
+        if phase == 'predict': 
+            return rescaled_forecasted_sales
+
+        self.log_dict({f"{phase}_{k}":v for k,v in score.items()}, on_step=False, on_epoch=True)
+        self.log_dict({f"{phase}_rescaled_{k}":v for k,v in rescaled_score.items()}, on_step=False, on_epoch=True)
+
+        return score['loss']
     
-    def denormalize(self, x, center, scale):
-        return (x * scale) + center
+    def denormalize(self, x):
+        return (x * self.scale) + self.center
 
-    def normalize(self, x, center, scale):
-        return (x - center) / scale
+    def normalize(self, x):
+        return (x - self.center) / self.scale

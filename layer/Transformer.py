@@ -53,15 +53,15 @@ class TimeDistributed(nn.Module):
     
 
 class FeatureFusionNetwork(nn.Module):
-    def __init__(self, embedding_dim, num_meta, dropout=0.2):
+    def __init__(self, input_dim, output_dim, num_meta, dropout=0.2):
         super(FeatureFusionNetwork, self).__init__()
-        self.meta_linear = nn.Linear(num_meta, embedding_dim)
-        self.batchnorm = nn.BatchNorm1d(embedding_dim*4)
+        self.meta_linear = nn.Linear(num_meta, input_dim)
+        self.batchnorm = nn.BatchNorm1d(input_dim*4)
         self.feature_fusion = nn.Sequential(
-            nn.Linear(embedding_dim*4, embedding_dim*2, bias=False),
+            nn.Linear(input_dim*4, input_dim*2, bias=False),
             nn.ReLU(),
             nn.Dropout(dropout),
-            nn.Linear(embedding_dim*2, embedding_dim)
+            nn.Linear(input_dim*2, output_dim)
         )
 
     def forward(self, image_embedding, text_embedding, temporal_embedding, meta_data):
@@ -73,11 +73,11 @@ class FeatureFusionNetwork(nn.Module):
 
 
 class TransformerEncoder(nn.Module):
-    def __init__(self, embedding_dim, input_len, num_vars, num_heads=4, dropout=0.2):
+    def __init__(self, output_dim, input_len, num_vars, num_heads=4, dropout=0.2):
         super().__init__()
-        self.input_linear = TimeDistributed(nn.Linear(num_vars, embedding_dim))
-        self.pos_embedding = PositionalEncoding(embedding_dim, max_len=input_len)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads, dropout=dropout, batch_first=True)
+        self.input_linear = TimeDistributed(nn.Linear(num_vars, output_dim))
+        self.pos_embedding = PositionalEncoding(output_dim, max_len=input_len)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=output_dim, nhead=num_heads, dropout=dropout, batch_first=True)
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
 
     def forward(self, inputs):

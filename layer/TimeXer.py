@@ -2,38 +2,28 @@ import torch.nn as nn
 from MVTSF.layer.Transformer import *
 
 
-class ExogenousInvertedEncoder(nn.Module):
-    def __init__(self, embedding_dim, input_len):
+class ExogenousEncoder(nn.Module):
+    def __init__(self, output_dim, input_len):
         super().__init__()
-        self.input_linear = TimeDistributed(nn.Linear(input_len, embedding_dim))
+        self.input_linear = TimeDistributed(nn.Linear(input_len, output_dim))
 
     def forward(self, inputs):
         inputs = inputs.permute(0,2,1)
         if inputs.dim() <= 2: inputs = inputs.unsqueeze(dim=-1)
         emb = self.input_linear(inputs)
         return emb
-
-class ExogenousEncoder(nn.Module):
-    def __init__(self, embedding_dim, input_len, num_vars):
-        super().__init__()
-        self.input_linear = TimeDistributed(nn.Linear(num_vars, embedding_dim))
-        self.pos_embedding = PositionalEncoding(embedding_dim, max_len=input_len)
-
-    def forward(self, inputs):
-        emb = self.input_linear(inputs)
-        emb = self.pos_embedding(emb)
-        return emb
-
+    
 
 class EndogenousEncoder(nn.Module):
-    def __init__(self, embedding_dim, input_len, num_vars):
+    def __init__(self, output_dim, input_len, segment_len):
         super().__init__()
-        self.input_linear = TimeDistributed(nn.Linear(num_vars, embedding_dim))
-        self.pos_embedding = PositionalEncoding(embedding_dim, max_len=input_len+1)
+        self.input_linear = SegmentEmbedding(output_dim, segment_len)
+        self.num_segments = input_len//segment_len
+        self.pos_embedding = PositionalEncoding(output_dim, max_len=self.num_segments)
 
     def forward(self, inputs, fusion_embedding):
         if inputs.dim() <= 2: inputs = inputs.unsqueeze(1)
-        emb = self.input_linear(inputs)
-        emb = torch.cat([fusion_embedding.unsqueeze(1), emb.squeeze()], dim=1)
+        emb = self.input_linear(inputs).squeeze()
         emb = self.pos_embedding(emb)
+        emb = torch.cat([fusion_embedding.unsqueeze(1), emb], dim=1)
         return emb

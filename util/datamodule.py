@@ -24,7 +24,6 @@ class BasicDataModule(pl.LightningDataModule):
         self.data_dict = json.load(open(os.path.join(self.data_dir, "data.json"), "r"))
         self.data_dict['image_embedding'] = pickle.load(open(os.path.join(self.data_dir, "fclip_image.pkl"), "rb"))
         self.data_dict['text_embedding'] = pickle.load(open(os.path.join(self.data_dir, "fclip_text.pkl"), "rb"))
-        self.data_dict['scaler'] = pickle.load(open(os.path.join(self.data_dir, f'{"_".join(self.meta_cols)}_scaler.pkl'), 'rb'))
 
     def setup(self, stage: str):
         if stage == "fit":
@@ -39,10 +38,10 @@ class BasicDataModule(pl.LightningDataModule):
         return DataLoader(self.train_dataset, batch_size=self.batch_size)
 
     def val_dataloader(self):
-        return DataLoader(self.valid_dataset, batch_size=self.batch_size)
+        return DataLoader(self.valid_dataset, batch_size=len(self.valid_dataset), shuffle=False)
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.batch_size)
+        return DataLoader(self.test_dataset, batch_size=len(self.test_dataset), shuffle=False)
 
     def predict_dataloader(self):
         return DataLoader(self.test_dataset, batch_size=len(self.test_dataset), shuffle=False)
@@ -73,7 +72,7 @@ class BasicDataset(Dataset):
             if self.use_weather: exo.extend(self.data_dict[item_id]['weather'])
             if self.use_meta_sale: exo.extend(self.data_dict[item_id]['meta_sale'])
 
-            endo = self.data_dict['scaler'][item_id]['center']
+            endo = self.data_dict[item_id]['endo_vars']
             
             item_sales.append(sales)
             release_dates.append(release_date)
@@ -108,10 +107,16 @@ class BasicDataset(Dataset):
 
 class VisuelleDataModule(BasicDataModule):
     def __init__(self, args):
+        args.use_trend = True
+        args.use_weather = args.num_exo_vars in [5,8]
+        args.use_meta_sale = args.num_exo_vars in [6,8]
         self.meta_cols = ['category',  'color', 'fabric']
         super().__init__(args)
 
 class MindBridgeDataModule(BasicDataModule):
     def __init__(self, args):
+        args.use_trend = True
+        args.use_weather = args.num_exo_vars in [5,9]
+        args.use_meta_sale = args.num_exo_vars in [7,9]
         self.meta_cols = ['brand', 'category',  'color', 'fabric']
         super().__init__(args)
