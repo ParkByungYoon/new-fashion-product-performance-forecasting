@@ -13,6 +13,11 @@ import json
 class BasicDataModule(pl.LightningDataModule):
     def __init__(self, args):
         super().__init__()
+        if args.num_exo_vars not in [0,2,3,5]:
+            raise NotImplementedError("Not Implemented yet")
+        args.use_trend = args.num_exo_vars in [3,5]
+        args.use_weather = args.num_exo_vars in [2,5]
+
         self.args = args
         self.data_dir = args.data_dir
         self.batch_size = args.batch_size
@@ -52,7 +57,6 @@ class BasicDataset(Dataset):
         super().__init__()
         self.use_trend = args.use_trend
         self.use_weather = args.use_weather
-        self.use_meta_sale = args.use_meta_sale
         self.data_dict = data_dict
         self.item_ids = item_ids
         self.__preprocess__()
@@ -70,8 +74,6 @@ class BasicDataset(Dataset):
             exo = []
             if self.use_trend: exo.extend(self.data_dict[item_id]['trend'])
             if self.use_weather: exo.extend(self.data_dict[item_id]['weather'])
-            if self.use_meta_sale: exo.extend(self.data_dict[item_id]['meta_sale'])
-
             endo = self.data_dict[item_id]['endo_vars']
             
             item_sales.append(sales)
@@ -107,16 +109,8 @@ class BasicDataset(Dataset):
 
 class VisuelleDataModule(BasicDataModule):
     def __init__(self, args):
-        args.use_trend = True
-        args.use_weather = args.num_exo_vars in [5,8]
-        args.use_meta_sale = args.num_exo_vars in [6,8]
-        self.meta_cols = ['category',  'color', 'fabric']
         super().__init__(args)
 
 class MindBridgeDataModule(BasicDataModule):
     def __init__(self, args):
-        args.use_trend = True
-        args.use_weather = args.num_exo_vars in [5,9]
-        args.use_meta_sale = args.num_exo_vars in [7,9]
-        self.meta_cols = ['brand', 'category',  'color', 'fabric']
         super().__init__(args)

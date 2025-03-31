@@ -30,10 +30,9 @@ def run(args):
     args.data_dir = args.data_dir + f"/{args.dataset_name}"
     args.log_dir = args.log_dir + f"/{args.dataset_name}"
 
-    if args.dataset_name == 'MindBridge':
-        # args.center, args.scale = 0.0, 1820.0
+    if not args.use_revin and args.dataset_name == 'MindBridge':
         args.center, args.scale = 40.89353961781402, 74.34192367524047
-    elif args.dataset_name == 'Visuelle':
+    elif not args.use_revin and args.dataset_name == 'Visuelle':
         args.center, args.scale  = 0.0, 875.0
 
     print(args)
@@ -91,18 +90,18 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=128)
     parser.add_argument('--input_dim', type=int, default=512)
     parser.add_argument('--output_dim', type=int, default=512)
-    parser.add_argument('--endo_input_len', type=int, default=12)
+    parser.add_argument('--endo_input_len', type=int, default=52)
     parser.add_argument('--exo_input_len', type=int, default=52)
     parser.add_argument('--output_len', type=int, default=12)
     parser.add_argument('--num_heads', type=int, default=8)
     parser.add_argument('--num_layers', type=int, default=2)
 
     # Specific arguments
+    parser.add_argument("--use_revin", action='store_true')
+    parser.add_argument("--use_endo", action='store_true')
     parser.add_argument("--use_trend", type=bool, default=False)
     parser.add_argument("--use_weather", type=bool, default=False)
-    parser.add_argument("--use_meta_sale", type=bool, default=False)
     parser.add_argument('--segment_len', type=int, default=4)
-    parser.add_argument('--num_endo_vars', type=int, default=4)
     parser.add_argument('--num_exo_vars', type=int, default=48)
     parser.add_argument("--num_meta", type=int, default=52)
 
