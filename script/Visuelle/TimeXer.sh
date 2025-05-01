@@ -1,6 +1,6 @@
 model_name=TimeXer
 dataset_name=Visuelle
-gpu_num=3
+gpu_num=1
 exo_input_len=52
 output_dim=256
 segment_len=4
@@ -20,5 +20,5 @@ for seed in 21 42 63 84 105
         --num_meta $num_meta \
         --num_exo_vars $num_exo_vars \
         --use_endo \
-        # --use_revin \
+        --use_revin
     done

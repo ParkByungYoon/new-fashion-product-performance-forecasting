@@ -48,7 +48,7 @@ def run(args):
 
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
         dirpath=os.path.join(args.log_dir,args.model_name),
-        filename=f'{args.model_name}-{datetime.datetime.now().strftime("%y%m%d-%H%M")}',
+        filename=f'{args.model_name}',
         monitor='valid_rescaled_adjusted_smape',
         mode='min',
         save_top_k=1
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     parser.add_argument("--use_trend", type=bool, default=False)
     parser.add_argument("--use_weather", type=bool, default=False)
     parser.add_argument('--segment_len', type=int, default=4)
-    parser.add_argument('--num_exo_vars', type=int, default=48)
+    parser.add_argument('--num_exo_vars', type=int, default=3)
     parser.add_argument("--num_meta", type=int, default=52)
 
     # wandb arguments

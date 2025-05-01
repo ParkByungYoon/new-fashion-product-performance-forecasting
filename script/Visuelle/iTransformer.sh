@@ -1,6 +1,6 @@
 model_name=iTransformer
 dataset_name=Visuelle
-gpu_num=1
+gpu_num=0
 exo_input_len=52
 output_dim=128
 num_meta=96
@@ -18,5 +18,5 @@ for seed in 21 42 63 84 105
         --num_meta $num_meta \
         --num_exo_vars $num_exo_vars \
         --use_endo \
-        # --use_revin \
+        --use_revin
     done
