@@ -111,6 +111,6 @@ class VisuelleDataModule(BasicDataModule):
     def __init__(self, args):
         super().__init__(args)
 
-class MindBridgeDataModule(BasicDataModule):
+class TBHDataModule(BasicDataModule):
     def __init__(self, args):
         super().__init__(args)
