@@ -1,6 +1,3 @@
-import sys
-sys.path.append('../')
-
 import torch
 import argparse
 import numpy as np
@@ -30,7 +27,7 @@ def run(args):
     args.data_dir = args.data_dir + f"/{args.dataset_name}"
     args.log_dir = args.log_dir + f"/{args.dataset_name}"
 
-    if not args.use_revin and args.dataset_name == 'MindBridge':
+    if not args.use_revin and args.dataset_name == 'TBH':
         args.center, args.scale = 40.89353961781402, 74.34192367524047
     elif not args.use_revin and args.dataset_name == 'Visuelle':
         args.center, args.scale  = 0.0, 875.0
@@ -38,11 +35,11 @@ def run(args):
     print(args)
     random_seed(args.seed)
 
-    model_module = importlib.import_module(f"MVTSF.model.{args.model_name}")
+    model_module = importlib.import_module(f"model.{args.model_name}")
     model_cls = getattr(model_module, args.model_name)
     model = model_cls(args)
 
-    dataset_module = importlib.import_module("MVTSF.util.datamodule")
+    dataset_module = importlib.import_module("util.datamodule")
     dataset_cls = getattr(dataset_module, f"{args.dataset_name}DataModule")
     dataset = dataset_cls(args)
 
@@ -76,9 +73,9 @@ def run(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Multivariate-Time-Series-Forecasting')
+    parser = argparse.ArgumentParser(description='New-Fashion-Product-Performance-Forecasting')
     # General arguments
-    parser.add_argument('--data_dir', type=str, default='/SSL_NAS/SFLAB/')
+    parser.add_argument('--data_dir', type=str, default='dataset')
     parser.add_argument('--log_dir', type=str, default='log')
     parser.add_argument('--seed', type=int, default=21)
     parser.add_argument('--num_epochs', type=int, default=100)
@@ -86,7 +83,7 @@ if __name__ == '__main__':
     parser.add_argument('--learning_rate', type=float, default=0.0001)
 
     parser.add_argument('--model_name', type=str, default='Transformer')
-    parser.add_argument('--dataset_name', type=str, default='MindBridge')
+    parser.add_argument('--dataset_name', type=str, default='TBH')
     parser.add_argument('--batch_size', type=int, default=128)
     parser.add_argument('--input_dim', type=int, default=512)
     parser.add_argument('--output_dim', type=int, default=512)
@@ -107,8 +104,8 @@ if __name__ == '__main__':
 
     # wandb arguments
     parser.add_argument('--wandb_entity', type=str, default='bonbak')
-    parser.add_argument('--wandb_proj', type=str, default='Multivariate-Time-Series-Forecasting')
-    parser.add_argument('--wandb_dir', type=str, default='/home/bonbak/MVTSF')
+    parser.add_argument('--wandb_proj', type=str, default='New-Fashion-Product-Performance-Forecasting')
+    parser.add_argument('--wandb_dir', type=str, default='./')
 
     args = parser.parse_args()
     run(args)

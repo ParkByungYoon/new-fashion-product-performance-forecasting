@@ -1,8 +1,9 @@
+#!/bin/bash
 model_name=TimeXer
 dataset_name=Visuelle
-gpu_num=1
+gpu_num=0
 exo_input_len=52
-output_dim=256
+output_dim=512
 segment_len=4
 num_meta=96
 num_exo_vars=5

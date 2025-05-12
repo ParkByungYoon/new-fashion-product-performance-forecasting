@@ -1,11 +1,11 @@
+#!/bin/bash
 model_name=iTransformer
-dataset_name=MindBridge
-gpu_num=3
+dataset_name=TBH
+gpu_num=0
 exo_input_len=52
-output_dim=128
+output_dim=512
 num_meta=52
 num_exo_vars=2
-
 
 for seed in 21 42 63 84 105
     do  

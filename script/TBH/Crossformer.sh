@@ -1,8 +1,9 @@
+#!/bin/bash
 model_name=Crossformer
-dataset_name=MindBridge
-gpu_num=3
+dataset_name=TBH
+gpu_num=0
 exo_input_len=52
-output_dim=256
+output_dim=512
 segment_len=4
 num_meta=52
 num_exo_vars=2

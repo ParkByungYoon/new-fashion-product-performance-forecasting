@@ -1,5 +1,5 @@
 import torch.nn as nn
-from MVTSF.layer.Transformer import *
+from layer.Transformer import *
 
 
 class ExogenousEncoder(nn.Module):

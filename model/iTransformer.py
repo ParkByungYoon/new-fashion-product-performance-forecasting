@@ -1,6 +1,5 @@
-from MVTSF.model.Transformer import Transformer
-from MVTSF.layer.iTransformer import InversedTransformerEncoder
-import torch
+from model.Transformer import Transformer
+from layer.iTransformer import InversedTransformerEncoder
 
 class iTransformer(Transformer):
     def __init__(self, *args, **kwargs):

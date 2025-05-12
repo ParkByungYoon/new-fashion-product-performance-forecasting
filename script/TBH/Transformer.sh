@@ -1,11 +1,11 @@
+#!/bin/bash
 model_name=Transformer
-dataset_name=MindBridge
-gpu_num=1
+dataset_name=TBH
+gpu_num=0
 exo_input_len=52
-output_dim=1024
+output_dim=512
 num_meta=52
-num_exo_vars=2
-num_epochs=20
+num_exo_vars=5
 
 for seed in 21 42 63 84 105
     do  
@@ -18,7 +18,6 @@ for seed in 21 42 63 84 105
         --exo_input_len $exo_input_len \
         --num_meta $num_meta \
         --num_exo_vars $num_exo_vars \
-        --num_epochs $num_epochs\
         --use_endo \
         --use_revin
     done

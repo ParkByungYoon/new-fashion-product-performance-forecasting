@@ -1,6 +1,6 @@
 import torch.nn as nn
 from einops import rearrange
-from MVTSF.layer.Transformer import *
+from layer.Transformer import *
 
 class CrossedTransformerEncoder(nn.Module):
     def __init__(self, output_dim, input_len, segment_len, num_heads=4, dropout=0.2):

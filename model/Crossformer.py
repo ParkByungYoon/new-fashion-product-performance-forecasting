@@ -1,7 +1,5 @@
-from MVTSF.model.Transformer import Transformer
-from MVTSF.layer.Crossformer import CrossedTransformerEncoder
-import torch
-from einops import rearrange
+from model.Transformer import Transformer
+from layer.Crossformer import CrossedTransformerEncoder
 
 class Crossformer(Transformer):
     def __init__(self, *args, **kwargs):

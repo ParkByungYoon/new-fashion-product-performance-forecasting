@@ -1,6 +1,5 @@
-from MVTSF.layer.TimeXer import *
-from MVTSF.model.Transformer import Transformer
-from MVTSF.util.metric import get_score
+from layer.TimeXer import *
+from model.Transformer import Transformer
 
     
 class TimeXer(Transformer):

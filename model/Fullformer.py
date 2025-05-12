@@ -1,6 +1,5 @@
-from MVTSF.model.Crossformer import *
-from MVTSF.layer.Fullformer import FullAttentionTransformerEncoder
-import torch
+from model.Crossformer import *
+from layer.Fullformer import FullAttentionTransformerEncoder
 
 class Fullformer(Crossformer):
     def __init__(self, *args, **kwargs):
