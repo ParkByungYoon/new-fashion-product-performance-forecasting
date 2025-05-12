@@ -8,6 +8,8 @@ def weighted_mean_absolute_percentage_error(gt: torch.Tensor, pred: torch.Tensor
     return 100 * (sum_abs_error / sum_gt).item()
 
 def get_score(gt, pred):
+    gt = gt.detach().cpu()
+    pred = pred.detach().cpu()
     adjusted_smape = SymmetricMeanAbsolutePercentageError()
     weighted_mape = WeightedMeanAbsolutePercentageError()
     mean_squared_error = MeanSquaredError()
